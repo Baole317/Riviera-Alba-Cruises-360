@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riviera Alba Project 360° Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        .pnlm-hotspot-base { cursor: pointer; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+        .viewer-container { width: 100%; height: 100%; position: absolute; top:0; left:0; pointer-events: none; }
+        .viewer-container.active { pointer-events: auto; }
+        #panorama-compare { pointer-events: none; } /* Left default is none until synced properly */
+        .slider-handle { position: absolute; z-index: 50; top: 0; bottom: 0; width: 4px; background: white; cursor: col-resize; transform: translateX(-50%); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .slider-handle svg { position: absolute; top: 50%; left: 50%; width: 32px; height: 32px; background: white; border-radius: 50%; transform: translate(-50%, -50%); padding: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); stroke: #18181b; cursor: pointer; transition: all 0.2s; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; } 
+        .slider-handle svg.unlocked { stroke: #f43f5e; }
+        .slider-handle svg:hover { background: #10b981; stroke: white; } </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans overflow-hidden h-screen flex flex-col">
+    <!-- Header -->
+    <header class="w-full bg-white border-b border-zinc-200 p-3 md:p-4 flex items-center justify-between z-20 shrink-0 text-zinc-900">
+        <div class="flex items-center gap-3">
+            <img src="https://binhanshipping.vn/wp-content/uploads/2024/07/cropped-logo-binh-an.webp" class="h-8 md:h-10 w-auto object-contain">
+            <h1 class="text-xs md:text-base font-extrabold tracking-tight leading-tight">Riviera Alba Project 360° Review</h1>
+        </div>
+    </header>
+
+    <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+        <main class="flex-1 relative bg-zinc-950 overflow-hidden flex items-center justify-center order-1 md:order-2">
+            <div id="site-plan-wrapper" class="relative max-w-full max-h-full shadow-2xl rounded-lg overflow-hidden hidden">
+                <img id="site-plan-img" src="" class="max-w-full max-h-[60vh] md:max-h-[90vh] object-contain select-none">
+                <div id="pins-container"></div>
+            </div>
+            <div id="loading-state" class="text-center space-y-4">
+                <div class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p class="text-zinc-500 text-sm font-medium">Đang tải dữ liệu dự án...</p>
+            </div>
+        </main>
+
+        <aside class="w-full md:w-80 bg-white border-t md:border-t-0 md:border-r border-zinc-200 flex flex-col order-2 md:order-1 overflow-hidden h-[35vh] md:h-full text-zinc-900">
+            <div class="flex flex-row md:flex-col h-full overflow-hidden">
+                <section class="w-1/4 md:w-full border-r md:border-r-0 md:border-b border-zinc-100 flex flex-col overflow-hidden">
+                    <div class="p-2 md:p-3 border-b border-zinc-50 bg-zinc-50/50"><h2 class="text-[8px] md:text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Điểm</h2></div>
+                    <div id="hotspot-list" class="flex-1 overflow-y-auto p-1 md:p-3 space-y-1"></div>
+                </section>
+                <section class="w-3/4 md:w-full flex flex-col overflow-hidden">
+                    <div class="p-2 md:p-3 border-b border-zinc-50 bg-zinc-50/50"><h2 class="text-[8px] md:text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Danh Mục</h2></div>
+                    <div id="kanban-container" class="flex-1 overflow-auto p-1 md:p-3">
+                        <div class="rounded-lg border border-zinc-200 overflow-hidden">
+        <table class="w-full text-[8px] md:text-[10px] border-collapse table-fixed">
+            <thead>
+                <tr class="text-zinc-600">
+                    <th style="background-color: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; padding: 4px; text-align: center; font-weight: bold;">To do</th>
+                    <th style="background-color: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; padding: 4px; text-align: center; font-weight: bold;">In progress</th>
+                    <th style="background-color: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; padding: 4px; text-align: center; font-weight: bold;">Done</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 360 Viewer Modal -->
+    <div id="viewer-modal" class="fixed inset-0 z-50 flex items-center justify-center p-2 md:p-8 bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="relative w-full h-full bg-zinc-900 rounded-xl md:rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col">
+            <div class="p-3 md:p-4 border-b border-white/5 flex items-center justify-between bg-zinc-900/50 backdrop-blur-md z-20">
+                <div class="flex items-center gap-4">
+                    <h2 id="active-name" class="text-xs md:text-sm font-bold text-white">Tên điểm</h2>
+                    <div id="compare-toggles" class="hidden flex bg-black/40 p-1 rounded-lg border border-white/10">
+                        <button id="toggle-none" class="px-3 py-1 text-[10px] md:text-xs font-bold rounded-md bg-emerald-600 text-white transition-all">Hiện tại(1 màn)</button>
+                        <button id="toggle-prev" class="px-3 py-1 text-[10px] md:text-xs font-bold rounded-md text-zinc-400 hover:text-white transition-all hidden">Kì trước</button>
+                        <button id="toggle-design" class="px-3 py-1 text-[10px] md:text-xs font-bold rounded-md text-zinc-400 hover:text-white transition-all hidden">Thiết kế</button>
+                    </div>
+                </div>
+                <button onclick="closeViewer()" class="p-1.5 md:p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 relative flex flex-col md:flex-row overflow-hidden">
+                <div id="viewer-wrapper" class="flex-1 bg-black relative select-none">
+                    <!-- Left Viewer (Compare) -->
+                    <div id="viewer-left-container" class="viewer-container !pointer-events-auto">
+                        <div id="panorama-compare" class="w-full h-full bg-black"></div>
+                        <div id="left-label" class="absolute top-4 left-4 z-40 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-white/20 hidden pointer-events-none"></div>
+                    </div>
+                    <!-- Right Viewer (Current) -->
+                    <div id="viewer-right-container" class="viewer-container !pointer-events-auto overflow-hidden">
+                        <div id="panorama-current" class="w-full h-full bg-black"></div>
+                        <div id="right-label" class="absolute top-4 right-4 z-40 bg-emerald-600/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white border border-emerald-400/30 hidden pointer-events-none">Hiện tại</div>
+                    </div>
+                    <!-- Slider Handle -->
+                    <div id="slider-handle" class="slider-handle hidden">
+      <svg id="sync-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+  </div>
+                </div>
+                
+                <div class="w-full md:w-64 bg-zinc-900/80 backdrop-blur-xl border-t md:border-t-0 md:border-l border-white/5 p-3 md:p-4 overflow-y-auto h-[30vh] md:h-full z-20">
+                    <h3 class="text-[8px] md:text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3 md:mb-4">Chuyển điểm nhìn</h3>
+                    <div id="modal-hotspot-list" class="grid grid-cols-2 md:grid-cols-1 gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let projectData = null;
+        let pViewer = null; // Right
+        let cViewer = null; // Left
+        let syncReady = false;
+        let isDraggingSlider = false;
+        let activeH = null;
+        let isSynced = true;
+        let syncOffset = {pitch: 0, yaw: 0};
+        let activePano = 'right';
+
+        async function init() {
+            try {
+                const res = await fetch('project_data.json');
+                projectData = await res.json();
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('site-plan-wrapper').classList.remove('hidden');
+                renderUI();
+                
+                // Slider drag logic
+                const wrapper = document.getElementById('viewer-wrapper');
+                const handle = document.getElementById('slider-handle');
+                const syncIcon = document.getElementById('sync-icon');
+                
+                syncIcon.addEventListener('mousedown', (e) => e.stopPropagation());
+                syncIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!isSynced) {
+                        syncOffset.pitch = cViewer.getPitch() - pViewer.getPitch();
+                        syncOffset.yaw = cViewer.getYaw() - pViewer.getYaw();
+                        isSynced = true;
+                        syncIcon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>';
+                        syncIcon.classList.remove('unlocked');
+                    } else {
+                        isSynced = false;
+                        syncIcon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path>';
+                        syncIcon.classList.add('unlocked');
+                    }
+                });
+                
+                document.getElementById('viewer-left-container').addEventListener('mousedown', () => activePano = 'left');
+                document.getElementById('viewer-left-container').addEventListener('touchstart', () => activePano = 'left');
+                document.getElementById('viewer-right-container').addEventListener('mousedown', () => activePano = 'right');
+                document.getElementById('viewer-right-container').addEventListener('touchstart', () => activePano = 'right');
+
+                handle.addEventListener('mousedown', () => isDraggingSlider = true);
+                window.addEventListener('mouseup', () => isDraggingSlider = false);
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDraggingSlider) return;
+                    const rect = wrapper.getBoundingClientRect();
+                    let x = e.clientX - rect.left;
+                    if (x < 0) x = 0; if (x > rect.width) x = rect.width;
+                    const pct = (x / rect.width) * 100;
+                    handle.style.left = pct + '%';
+                    document.getElementById('viewer-right-container').style.clipPath = `inset(0 0 0 ${pct}%)`;
+                });
+                // Touch logic
+                handle.addEventListener('touchstart', () => isDraggingSlider = true, {passive: true});
+                window.addEventListener('touchend', () => isDraggingSlider = false);
+                window.addEventListener('touchmove', (e) => {
+                    if (!isDraggingSlider || !e.touches[0]) return;
+                    const rect = wrapper.getBoundingClientRect();
+                    let x = e.touches[0].clientX - rect.left;
+                    if (x < 0) x = 0; if (x > rect.width) x = rect.width;
+                    const pct = (x / rect.width) * 100;
+                    handle.style.left = pct + '%';
+                    document.getElementById('viewer-right-container').style.clipPath = `inset(0 0 0 ${pct}%)`;
+                }, {passive: true});
+            } catch (e) {
+                document.getElementById('loading-state').innerHTML = '<div class="text-rose-500">Lỗi nạp dữ liệu</div>';
+            }
+        }
+
+        function syncViewers() {
+            if (pViewer && cViewer && syncReady && !isDraggingSlider && isSynced) {
+                if (activePano === 'right') {
+                   const pPitch = pViewer.getPitch();
+                   const pYaw = pViewer.getYaw();
+                   cViewer.setPitch(pPitch + syncOffset.pitch, false);
+                   cViewer.setYaw(pYaw + syncOffset.yaw, false);
+                   cViewer.setHfov(pViewer.getHfov(), false);
+                } else {
+                   const cPitch = cViewer.getPitch();
+                   const cYaw = cViewer.getYaw();
+                   pViewer.setPitch(cPitch - syncOffset.pitch, false);
+                   pViewer.setYaw(cYaw - syncOffset.yaw, false);
+                   pViewer.setHfov(cViewer.getHfov(), false);
+                }
+            }
+            requestAnimationFrame(syncViewers);
+        }
+        requestAnimationFrame(syncViewers);
+
+        function renderUI() {
+            const list = document.getElementById('hotspot-list');
+            const modalList = document.getElementById('modal-hotspot-list');
+            const pins = document.getElementById('pins-container');
+            const sitePlanImg = document.getElementById('site-plan-img');
+            
+            if (projectData.sitePlan) sitePlanImg.src = projectData.sitePlan;
+
+            projectData.hotspots.forEach(h => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-1 md:gap-2.5 p-1 md:p-2.5 rounded-lg border bg-zinc-50 border-zinc-200 hover:border-emerald-500 cursor-pointer';
+                item.innerHTML = `<span class="text-[9px] md:text-xs font-medium">${h.name}</span>`;
+                item.onclick = () => openViewer(h);
+                list.appendChild(item);
+
+                const modalItem = document.createElement('div');
+                modalItem.className = 'flex items-center gap-2 p-2 rounded border bg-zinc-800/50 border-zinc-700/50 text-zinc-400 hover:bg-emerald-500/10 cursor-pointer text-xs';
+                modalItem.innerHTML = `<span class="truncate">${h.name}</span>`;
+                modalItem.onclick = () => openViewer(h);
+                modalList.appendChild(modalItem);
+
+                const pin = document.createElement('div');
+                pin.className = 'absolute w-4 h-4 -ml-2 -mt-4 cursor-pointer z-20 flex flex-col items-center';
+                pin.style.left = h.x + '%'; pin.style.top = h.y + '%';
+                pin.innerHTML = `<div class="p-1 bg-orange-600 rounded-full border border-white"></div><div class="mt-1 bg-black/60 text-white text-[8px] px-1 rounded">${h.name}</div>`;
+                pin.onclick = () => openViewer(h);
+                pins.appendChild(pin);
+            });
+
+            // Toggles
+            const setMode = (mode) => {
+                document.querySelectorAll('#compare-toggles button').forEach(b => b.classList.replace('bg-emerald-600','bg-transparent'));
+                document.querySelectorAll('#compare-toggles button').forEach(b => b.classList.replace('text-white','text-zinc-400'));
+                
+                const btn = document.getElementById('toggle-' + (mode === 'none' ? 'none' : mode === 'previous' ? 'prev' : 'design'));
+                btn.classList.add('bg-emerald-600', 'text-white');
+                btn.classList.remove('text-zinc-400', 'bg-transparent');
+
+                if (mode === 'none') {
+                    document.getElementById('viewer-right-container').style.clipPath = 'none';
+                    document.getElementById('slider-handle').classList.add('hidden');
+                    document.getElementById('left-label').classList.add('hidden');
+                    document.getElementById('right-label').classList.add('hidden');
+                    if(cViewer) { cViewer.destroy(); cViewer = null; }
+                } else {
+                    document.getElementById('slider-handle').classList.remove('hidden');
+                    document.getElementById('slider-handle').style.left = '50%';
+                    document.getElementById('viewer-right-container').style.clipPath = 'inset(0 0 0 50%)';
+                    document.getElementById('right-label').classList.remove('hidden');
+                    const ll = document.getElementById('left-label');
+                    ll.classList.remove('hidden');
+                    ll.innerText = mode === 'previous' ? 'Kì trước' : 'Thiết kế';
+                    loadCompareViewer(mode === 'previous' ? activeH.previousImageData : activeH.designImageData);
+                }
+            };
+
+            document.getElementById('toggle-none').onclick = () => setMode('none');
+            document.getElementById('toggle-prev').onclick = () => setMode('previous');
+            document.getElementById('toggle-design').onclick = () => setMode('design');
+        }
+
+        function loadCompareViewer(img) {
+            if(cViewer) {
+                 cViewer.destroy();
+                 syncReady = false;
+            }
+            cViewer = pannellum.viewer('panorama-compare', {
+                type: 'equirectangular',
+                panorama: img,
+                autoLoad: true,
+                showControls: false,
+                mouseZoom: true,
+                draggable: true
+            });
+            cViewer.on('load', () => { syncReady = true; });
+        }
+
+        function openViewer(h) {
+            activeH = h;
+            const modal = document.getElementById('viewer-modal');
+            modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.getElementById('active-name').innerText = h.name;
+            
+            // Setup toggles
+            const toggles = document.getElementById('compare-toggles');
+            const prevBtn = document.getElementById('toggle-prev');
+            const desBtn = document.getElementById('toggle-design');
+            
+            if (h.previousImageData || h.designImageData) {
+                toggles.classList.remove('hidden');
+                h.previousImageData ? prevBtn.classList.remove('hidden') : prevBtn.classList.add('hidden');
+                h.designImageData ? desBtn.classList.remove('hidden') : desBtn.classList.add('hidden');
+            } else {
+                toggles.classList.add('hidden');
+            }
+            
+            // Reset right
+            document.getElementById('viewer-right-container').style.clipPath = 'none';
+            document.getElementById('slider-handle').classList.add('hidden');
+            document.getElementById('left-label').classList.add('hidden');
+            document.getElementById('right-label').classList.add('hidden');
+            
+            document.getElementById('toggle-none').click(); // Default 1 screen
+            isSynced = true; syncOffset = {pitch: 0, yaw: 0}; activePano = 'right';
+            const icon = document.getElementById('sync-icon');
+            if(icon) { icon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>'; icon.classList.remove('unlocked'); }
+            
+            if (pViewer) { pViewer.destroy(); pViewer = null; }
+            if (cViewer) { cViewer.destroy(); cViewer = null; }
+            syncReady = false;
+
+            pViewer = pannellum.viewer('panorama-current', {
+                type: 'equirectangular',
+                panorama: h.imageData,
+                autoLoad: true,
+                showControls: true,
+                hotSpots: (h.links || []).map(link => {
+                    const target = projectData.hotspots.find(item => item.id === link.targetId);
+                    return { pitch: link.pitch, yaw: link.yaw, type: 'info', text: target ? target.name : '', clickHandlerFunc: () => openViewer(target) };
+                })
+            });
+            pViewer.on('load', () => { syncReady = true; });
+        }
+
+        function closeViewer() {
+            const modal = document.getElementById('viewer-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (pViewer) pViewer.destroy(); pViewer = null;
+                if (cViewer) cViewer.destroy(); cViewer = null;
+                activeH = null;
+                syncReady = false;
+            }, 300);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
+    

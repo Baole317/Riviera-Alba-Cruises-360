@@ -1,0 +1,105 @@
+{
+  "sitePlan": "./siteplan.jpg",
+  "hotspots": [
+    {
+      "id": "pyvrov057",
+      "name": "Ext1",
+      "x": 81.44798376422835,
+      "y": 51.73905452852515,
+      "imageData": "./Ext1.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "bgt4pbuhx",
+      "name": "Ext2",
+      "x": 79.96558722315362,
+      "y": 57.698201780760805,
+      "imageData": "./Ext2.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "60ijrx8ua",
+      "name": "Restaurant-1",
+      "x": 44.88220241771817,
+      "y": 55.21522375899595,
+      "imageData": "./Restaurant-1.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "g540y9lrx",
+      "name": "Restaurant-2",
+      "x": 42.905673696285184,
+      "y": 61.1743710112316,
+      "imageData": "./Restaurant-2.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "7c9nvfmkq",
+      "name": "Lounge-1",
+      "x": 37.32903908938498,
+      "y": 40.93810013384803,
+      "imageData": "./Lounge-1.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "1o0lzdnt5",
+      "name": "Lounge-2",
+      "x": 31.822994793964526,
+      "y": 42.55203584799519,
+      "imageData": "./Lounge-2.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "i02t6d98o",
+      "name": "Lobby2-1",
+      "x": 51.305920762375365,
+      "y": 35.72384628814184,
+      "imageData": "./Lobby2-1.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "6bndm7xi2",
+      "name": "Lobby2-2",
+      "x": 46.50577958175241,
+      "y": 36.96533529902427,
+      "imageData": "./Lobby2-2.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    },
+    {
+      "id": "oygwwy9tc",
+      "name": "Suite-1",
+      "x": 56.67078443483632,
+      "y": 35.22725068378887,
+      "imageData": "./Suite-1.jpg",
+      "type": "image",
+      "links": [],
+      "previousImageData": null,
+      "designImageData": null
+    }
+  ],
+  "kanbanData": []
+}
